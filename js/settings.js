@@ -321,11 +321,11 @@ window.PageSettings = {
   deleteAccount() {
     if (!confirm('Are you absolutely sure? All data will be deleted permanently.')) return;
     ['hf_user','hf_habits','hf_logs','hf_session','hf_seeded','hf_avatar'].forEach(k => localStorage.removeItem(k));
-    window.location.href = 'index.html';
+    window.location.href = 'landing.html';
   },
 
   async logout() {
     await DB.auth.logout();
-    window.location.href = 'index.html';
+    window.location.href = 'landing.html';
   },
 };

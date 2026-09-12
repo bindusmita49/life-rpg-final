@@ -160,17 +160,23 @@ document.getElementById('auth-form').addEventListener('submit', async (e) => {
   }
 });
 
-// ── Demo Mode ─────────────────────────────────────────
-document.getElementById('btn-demo').addEventListener('click', async () => {
-  clearAlert();
-  try {
-    await DB.auth.login('demo@habitflow.app', 'demo1234');
-    showAlert('Entering demo mode... 🌊', 'success');
-    setTimeout(() => { window.location.href = 'app.html'; }, 700);
-  } catch(e) {
-    showAlert('Demo mode error: ' + e.message, 'error');
-  }
-});
+// ── Clear form inputs on page load/refresh ───────────
+function clearFormInputs() {
+  const emailInput = document.getElementById('auth-email');
+  const passInput  = document.getElementById('auth-pass');
+  const nameInput  = document.getElementById('auth-name');
+  if (emailInput) emailInput.value = '';
+  if (passInput) passInput.value = '';
+  if (nameInput) nameInput.value = '';
+  const form = document.getElementById('auth-form');
+  if (form) form.reset();
+}
+
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', clearFormInputs);
+} else {
+  clearFormInputs();
+}
 
 // ── Keydown Enter ─────────────────────────────────────
 document.addEventListener('keydown', (e) => {

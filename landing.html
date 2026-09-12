@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
@@ -26,7 +26,7 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
-      padding: 24px 48px;
+      padding: 4px 48px;
       max-width: 1200px;
       margin: 0 auto;
       width: 100%;
@@ -60,15 +60,80 @@
       flex-direction: column;
       align-items: center;
       padding: 20px 24px 60px;
-      max-width: 1100px;
+      max-width: 1200px;
       margin: 0 auto;
       width: 100%;
     }
 
     .hero-section {
-      text-align: center;
+      text-align: left;
       padding: 40px 16px 60px;
-      max-width: 820px;
+      max-width: 1200px;
+      width: 100%;
+    }
+
+    .hero-inner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 40px;
+      flex-wrap: wrap;
+    }
+
+    .hero-content {
+      flex: 1 1 420px;
+      min-width: 320px;
+      max-width: 520px;
+    }
+
+    .hero-content .hero-subheadline {
+      margin: 0 0 36px;
+    }
+
+    .hero-visual {
+      flex: 1 1 450px;
+      min-width: 300px;
+      max-width: 100%;
+      display: flex;
+      justify-content: flex-end;
+      align-items: center;
+      position: relative;
+      margin-right: -20px;
+    }
+
+    .hero-image {
+      width: 100%;
+      max-width: 750px;
+      height: auto;
+      display: block;
+      filter: drop-shadow(0 0 75px rgba(0,212,200,.45)) drop-shadow(0 0 30px rgba(0,212,200,.3));
+      position: relative;
+      z-index: 2;
+    }
+
+    @media (max-width: 900px) {
+      .hero-inner {
+        flex-direction: column;
+        text-align: center;
+        gap: 36px;
+      }
+      .hero-content {
+        text-align: center;
+        max-width: 100%;
+      }
+      .hero-ctas {
+        justify-content: center;
+      }
+      .hero-visual {
+        width: 100%;
+        max-width: 520px;
+        justify-content: center;
+        margin-right: 0;
+      }
+      .hero-image {
+        max-width: 520px;
+        filter: drop-shadow(0 0 50px rgba(0,212,200,.4));
+      }
     }
 
     .hero-badge {
@@ -82,10 +147,14 @@
       font-weight: 600;
       letter-spacing: .08em;
       text-transform: uppercase;
-      padding: 6px 16px;
+      padding: 6px 20px;
       border-radius: 999px;
       margin-bottom: 24px;
       box-shadow: 0 0 20px rgba(0,212,200,.15);
+    }
+
+    .hero-badge i {
+      font-size: 12px;
     }
 
     .hero-headline {
@@ -101,7 +170,7 @@
     }
 
     .hero-subheadline {
-      font-size: clamp(15px, 2vw, 18px);
+      font-size: clamp(14px, 1.7vw, 16px);
       color: var(--text-secondary);
       line-height: 1.6;
       max-width: 640px;
@@ -110,7 +179,6 @@
 
     .hero-ctas {
       display: flex;
-      justify-content: center;
       align-items: center;
       gap: 16px;
       flex-wrap: wrap;
@@ -122,7 +190,7 @@
       justify-content: center;
       gap: 10px;
       padding: 14px 32px;
-      background: linear-gradient(135deg, var(--teal) 0%, var(--teal-dark) 100%);
+      background: linear-gradient(135deg, #f4c430 0%, #d4a017 100%);
       color: #060e1a;
       font-weight: 700;
       font-size: 15px;
@@ -130,12 +198,12 @@
       text-decoration: none;
       border: none;
       cursor: pointer;
-      box-shadow: 0 4px 20px var(--teal-glow);
+      box-shadow: 0 4px 24px rgba(244,196,48,.45);
       transition: all .25s ease;
     }
     .btn-cta-primary:hover {
       transform: translateY(-2px);
-      box-shadow: 0 6px 28px rgba(0,212,200,.5);
+      box-shadow: 0 6px 32px rgba(244,196,48,.6);
     }
 
     .btn-cta-demo {
@@ -248,6 +316,106 @@
       line-height: 1.55;
     }
 
+    /* ── Full-Width Detail Boxes ──────────────────────────── */
+    .detail-boxes-list {
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+      margin-top: 36px;
+      width: 100%;
+    }
+
+    .detail-box-full {
+      width: 100%;
+      display: flex;
+      align-items: center;
+      gap: 40px;
+      padding: 48px 40px;
+      margin-bottom: 24px;
+      background: var(--glass);
+      border: 1px solid var(--card-border);
+      border-radius: var(--radius);
+      backdrop-filter: blur(16px);
+      box-shadow: var(--shadow);
+      text-align: left;
+      transition: transform .25s ease, border-color .25s ease, box-shadow .25s ease;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .detail-box-full:last-child {
+      margin-bottom: 0;
+    }
+
+    .detail-box-full:hover {
+      transform: translateY(-4px);
+      border-color: rgba(0,212,200,.3);
+      box-shadow: 0 12px 40px rgba(0,0,0,.5), 0 0 20px rgba(0,212,200,.1);
+    }
+
+    .detail-box-full.reverse {
+      flex-direction: row-reverse;
+    }
+
+    .detail-box-content {
+      flex: 1;
+    }
+
+    .detail-box-title {
+      font-family: 'Playfair Display', Georgia, serif;
+      font-size: clamp(22px, 2.6vw, 28px);
+      font-weight: 700;
+      margin-bottom: 12px;
+      color: var(--text-primary);
+    }
+
+    .detail-box-desc {
+      font-size: 15px;
+      color: var(--text-secondary);
+      line-height: 1.65;
+      margin: 0;
+    }
+
+    .detail-box-icon {
+      flex-shrink: 0;
+      width: 68px;
+      height: 68px;
+      border-radius: 18px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 30px;
+      background: rgba(0,212,200,.12);
+      border: 1px solid rgba(0,212,200,.25);
+      color: var(--teal);
+    }
+
+    .detail-box-icon.icon-gold {
+      background: rgba(244,196,48,.12);
+      border-color: rgba(244,196,48,.25);
+      color: var(--gold);
+    }
+
+    .detail-box-icon.icon-teal-light {
+      background: rgba(77,232,224,.12);
+      border-color: rgba(77,232,224,.25);
+      color: var(--teal-light);
+    }
+
+    @media (max-width: 768px) {
+      .detail-box-full,
+      .detail-box-full.reverse {
+        flex-direction: column;
+        text-align: center;
+        gap: 24px;
+        padding: 36px 24px;
+      }
+      .detail-box-title,
+      .detail-box-desc {
+        text-align: center;
+      }
+    }
+
     /* ── Footer ───────────────────────────────────────────── */
     .landing-footer {
       position: relative;
@@ -271,6 +439,11 @@
       .hero-section { padding: 20px 0 40px; }
       .hero-ctas { flex-direction: column; width: 100%; }
       .btn-cta-primary, .btn-cta-demo { width: 100%; }
+      .hero-visual { max-width: 100%; }
+      .hero-image {
+        max-width: 100%;
+        filter: drop-shadow(0 0 35px rgba(0,212,200,.35));
+      }
     }
   </style>
 </head>
@@ -303,25 +476,22 @@
 
     <!-- Hero Section -->
     <section class="hero-section">
-      <div class="hero-badge">
-        <i class="fa-solid fa-gamepad"></i> Level Up Your Daily Routine
-      </div>
-
-      <h1 class="hero-headline">
-        Turn Your Habits Into a Life RPG
-      </h1>
-
-      <p class="hero-subheadline">
-        Embark on a daily quest of personal growth. Track habits, sustain streaks, collect rare ocean treasures, and unlock deep insights in a calming deep-sea world.
-      </p>
-
-      <div class="hero-ctas">
-        <a href="index.html" class="btn-cta-primary" id="btn-hero-start">
-          Get Started <i class="fa-solid fa-arrow-right"></i>
-        </a>
-        <button type="button" class="btn-cta-demo" id="btn-hero-demo">
-          <i class="fa-solid fa-fish"></i> Try Demo (Instant Access)
-        </button>
+      <div class="hero-inner">
+        <div class="hero-content">
+          <div class="hero-badge">
+            <i class="fa-solid fa-gamepad"></i> Level Up Your Daily Routine
+          </div>
+          <h1 class="hero-headline">Turn Your Habits Into a Life RPG</h1>
+          <p class="hero-subheadline">Track habits, build streaks, and unlock deep insights in a calming deep-sea world of personal growth.</p>
+          <div class="hero-ctas">
+            <a href="index.html" class="btn-cta-primary" id="btn-hero-start">
+              Get Started <i class="fa-solid fa-arrow-right"></i>
+            </a>
+          </div>
+        </div>
+        <div class="hero-visual">
+          <img src="assets/hero-image.png" alt="Life RPG hero visual" class="hero-image">
+        </div>
       </div>
     </section>
 
@@ -356,6 +526,42 @@
           </div>
           <h3 class="card-title">See Your Progress</h3>
           <p class="card-desc">Visualize your growth with comprehensive analytics, completion charts, and monthly habit calendars.</p>
+        </div>
+      </div>
+
+      <!-- Full-Width Detail Boxes -->
+      <div class="detail-boxes-list">
+        <!-- Box 1: Text Left, Icon Right -->
+        <div class="detail-box-full">
+          <div class="detail-box-content">
+            <h3 class="detail-box-title">Why Life RPG Works</h3>
+            <p class="detail-box-desc">Traditional habit trackers feel like chores. Life RPG borrows what makes games addictive — visible progress, streak momentum, and small wins that compound — and applies it to your real daily routines. No cheating your own stats: every action is logged and verified.</p>
+          </div>
+          <div class="detail-box-icon">
+            <i class="fa-solid fa-gamepad"></i>
+          </div>
+        </div>
+
+        <!-- Box 2: Icon Left, Text Right (Reversed) -->
+        <div class="detail-box-full reverse">
+          <div class="detail-box-content">
+            <h3 class="detail-box-title">Built for Consistency, Not Perfection</h3>
+            <p class="detail-box-desc">Missing a day doesn't erase your progress. Life RPG's streak system rewards showing up more often than it punishes an off day, so you build a sustainable routine instead of an all-or-nothing cycle that burns out in a week.</p>
+          </div>
+          <div class="detail-box-icon icon-gold">
+            <i class="fa-solid fa-seedling"></i>
+          </div>
+        </div>
+
+        <!-- Box 3: Text Left, Icon Right -->
+        <div class="detail-box-full">
+          <div class="detail-box-content">
+            <h3 class="detail-box-title">Your Data, Your Ocean</h3>
+            <p class="detail-box-desc">Every habit you track, every streak you build, and every insight you unlock is stored securely under your own account. Log in from anywhere and pick up exactly where you left off.</p>
+          </div>
+          <div class="detail-box-icon icon-teal-light">
+            <i class="fa-solid fa-water"></i>
+          </div>
         </div>
       </div>
     </section>

@@ -55,16 +55,23 @@ window.App = {
   buildHeader(user) {
     const name    = user?.fullName || user?.full_name || user?.email?.split('@')[0] || 'Explorer';
     const initial = name[0]?.toUpperCase() || 'U';
-    const email   = user?.email || 'demo@habitflow.app';
 
-    document.getElementById('header-profile-name').textContent  = name;
-    document.getElementById('header-profile-email').textContent = email;
-    document.getElementById('header-avatar-text').textContent   = initial;
+    const avatarText = document.getElementById('header-avatar-text');
+    if (avatarText) avatarText.textContent = initial;
+
+    const nameEl = document.getElementById('header-profile-name');
+    if (nameEl) nameEl.textContent = name;
+
+    const emailEl = document.getElementById('header-profile-email');
+    if (emailEl) emailEl.textContent = user?.email || '';
 
     // Search
-    document.getElementById('header-search-input').addEventListener('input', (e) => {
-      this.handleSearch(e.target.value);
-    });
+    const searchInput = document.getElementById('header-search-input');
+    if (searchInput) {
+      searchInput.addEventListener('input', (e) => {
+        this.handleSearch(e.target.value);
+      });
+    }
   },
 
   buildBubbles() {

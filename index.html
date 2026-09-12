@@ -6,8 +6,69 @@
   <title>Life RPG — Login</title>
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🌊</text></svg>">
   <link rel="stylesheet" href="css/auth.css">
+  <!-- Google Fonts: Inter & Sora -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Sora:wght@400;600;700;800&display=swap" rel="stylesheet">
   <!-- Font Awesome Icons -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <style>
+    .auth-page-layout {
+      display: flex;
+      align-items: center;
+      justify-content: flex-start;
+      min-height: 100vh;
+      gap: 40px;
+      padding: 40px 24px 40px 24px;
+      max-width: 1300px;
+      margin: 0 auto;
+      position: relative;
+      z-index: 5;
+    }
+
+    .auth-visual-side {
+      flex: 1.2 1 560px;
+      display: flex;
+      justify-content: flex-start;
+      align-items: center;
+      position: relative;
+    }
+
+    .auth-illustration {
+      width: 100%;
+      max-width: 640px;
+      height: auto;
+      display: block;
+      filter: drop-shadow(0 0 70px rgba(0,212,200,.25));
+      mix-blend-mode: screen;
+      opacity: 0.95;
+    }
+
+    .auth-form-side {
+      flex: 1 1 400px;
+      max-width: 460px;
+      display: flex;
+      justify-content: center;
+    }
+
+    @media (max-width: 900px) {
+      .auth-page-layout {
+        flex-direction: column;
+        gap: 32px;
+        padding: 24px;
+        justify-content: center;
+      }
+      .auth-visual-side {
+        order: -1;
+      }
+      .auth-illustration {
+        max-width: 320px;
+      }
+      .auth-form-side {
+        max-width: 100%;
+      }
+    }
+  </style>
 </head>
 <body>
 
@@ -17,85 +78,88 @@
     <div class="bubbles" id="auth-bubbles"></div>
   </div>
 
-  <!-- Auth Card -->
-  <div class="auth-wrapper">
-    <div class="auth-card">
+  <!-- Two-Column Auth Layout -->
+  <div class="auth-page-layout">
 
-      <!-- Logo -->
-      <a href="landing.html" class="auth-logo" style="text-decoration:none;color:inherit;">
-        <div class="auth-logo-icon">🌊</div>
-        <div class="auth-logo-text">
-          <h1>Life RPG</h1>
-          <p>Small Steps · Big Changes</p>
-        </div>
-      </a>
-
-      <!-- Heading -->
-      <h2 class="auth-heading" id="auth-heading">Welcome Back <span>🌊</span></h2>
-      <p class="auth-sub" id="auth-sub">Sign in to continue your journey.</p>
-
-      <!-- Tab Toggle -->
-      <div class="auth-tabs">
-        <button class="auth-tab active" data-mode="login">Sign In</button>
-        <button class="auth-tab"        data-mode="signup">Create Account</button>
-      </div>
-
-      <!-- Alert -->
-      <div class="auth-alert" id="auth-alert"></div>
-
-      <!-- Form -->
-      <form class="auth-form" id="auth-form">
-
-        <!-- Name (signup only) -->
-        <div class="form-group" id="signup-name-group" style="display:none;flex-direction:column;gap:8px">
-          <label for="auth-name">Full Name</label>
-          <div class="input-wrap">
-            <i class="fa-solid fa-user"></i>
-            <input type="text" id="auth-name" placeholder="Your full name" autocomplete="name">
-          </div>
-        </div>
-
-        <!-- Email -->
-        <div class="form-group">
-          <label for="auth-email">Email Address</label>
-          <div class="input-wrap">
-            <i class="fa-solid fa-envelope"></i>
-            <input type="email" id="auth-email" placeholder="you@example.com" autocomplete="email" required>
-          </div>
-        </div>
-
-        <!-- Password -->
-        <div class="form-group">
-          <label for="auth-pass">Password</label>
-          <div class="input-wrap">
-            <i class="fa-solid fa-lock"></i>
-            <input type="password" id="auth-pass" placeholder="Your password" autocomplete="current-password" required>
-            <button type="button" class="toggle-pw"><i class="fa-solid fa-eye-slash"></i></button>
-          </div>
-        </div>
-
-        <!-- Submit -->
-        <button type="submit" class="btn-auth" id="auth-btn">
-          <span class="btn-text" id="auth-btn-text">Sign In</span>
-          <div class="btn-spinner"></div>
-        </button>
-
-        <!-- Divider -->
-        <div class="auth-divider">or try without an account</div>
-
-        <!-- Demo mode -->
-        <button type="button" class="btn-demo" id="btn-demo">
-          <i class="fa-solid fa-fish"></i> &nbsp; Enter Demo Mode — No signup needed
-        </button>
-
-      </form>
-
-      <!-- Footer -->
-      <div class="auth-footer">
-        <span>Life RPG</span> — One habit at a time, you're building a better you 🌊
-      </div>
-
+    <!-- Left: Illustration -->
+    <div class="auth-visual-side">
+      <img src="assets/assets/login-illustration.png" alt="Time management illustration" class="auth-illustration">
     </div>
+
+    <!-- Right: Auth Card (unchanged) -->
+    <div class="auth-form-side">
+      <div class="auth-wrapper">
+        <div class="auth-card">
+
+          <!-- Back to Home Link -->
+          <a href="landing.html" class="back-home-link">
+            <i class="fa-solid fa-arrow-left"></i> Back to Home
+          </a>
+
+          <!-- Logo -->
+          <a href="landing.html" class="auth-logo" style="text-decoration:none;color:inherit;">
+            <div class="auth-logo-icon">🌊</div>
+            <div class="auth-logo-text">
+              <h1>Life RPG</h1>
+              <p>Small Steps · Big Changes</p>
+            </div>
+          </a>
+
+          <!-- Heading -->
+          <h2 class="auth-heading" id="auth-heading">Welcome Back <span>🌊</span></h2>
+
+          <!-- Tab Toggle -->
+          <div class="auth-tabs">
+            <button class="auth-tab active" data-mode="login">Sign In</button>
+            <button class="auth-tab"        data-mode="signup">Create Account</button>
+          </div>
+
+          <!-- Alert -->
+          <div class="auth-alert" id="auth-alert"></div>
+
+          <!-- Form -->
+          <form class="auth-form" id="auth-form" autocomplete="off">
+
+            <!-- Name (signup only) -->
+            <div class="form-group" id="signup-name-group" style="display:none;flex-direction:column;gap:8px">
+              <label for="auth-name">Full Name</label>
+              <div class="input-wrap">
+                <i class="fa-solid fa-user"></i>
+                <input type="text" id="auth-name" placeholder="Your full name" autocomplete="off">
+              </div>
+            </div>
+
+            <!-- Email -->
+            <div class="form-group">
+              <label for="auth-email">Email Address</label>
+              <div class="input-wrap">
+                <i class="fa-solid fa-envelope"></i>
+                <input type="email" id="auth-email" placeholder="you@example.com" autocomplete="off" required>
+              </div>
+            </div>
+
+            <!-- Password -->
+            <div class="form-group">
+              <label for="auth-pass">Password</label>
+              <div class="input-wrap">
+                <i class="fa-solid fa-lock"></i>
+                <input type="password" id="auth-pass" placeholder="Your password" autocomplete="off" required>
+                <button type="button" class="toggle-pw"><i class="fa-solid fa-eye-slash"></i></button>
+              </div>
+            </div>
+
+            <!-- Submit -->
+            <button type="submit" class="btn-auth" id="auth-btn">
+              <span class="btn-text" id="auth-btn-text">Sign In</span>
+              <div class="btn-spinner"></div>
+            </button>
+
+          </form>
+
+        </div>
+      </div>
+    </div>
+
   </div>
 
   <!-- Scripts -->
