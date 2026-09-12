@@ -11,6 +11,7 @@ window.App = {
     habits:   { label: 'My Habits', icon: 'fa-list-check',      render: () => PageHabits.render() },
     calendar: { label: 'Calendar',  icon: 'fa-calendar-days',   render: () => PageCalendar.render() },
     rewards:  { label: 'Rewards',   icon: 'fa-star',            render: () => PageRewards.render() },
+    shop:     { label: 'Shop',      icon: 'fa-store',           render: () => PageShop.render() },
     insights: { label: 'Insights',  icon: 'fa-chart-line',      render: () => PageInsights.render() },
     settings: { label: 'Settings',  icon: 'fa-gear',            render: () => PageSettings.render() },
   },

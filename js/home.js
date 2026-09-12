@@ -4,6 +4,7 @@
 'use strict';
 
 window.PageHome = {
+  _currentLevel: 1,
   quotes: [
     '"Discipline today builds the freedom tomorrow."',
     '"Small steps every day lead to big results."',
@@ -35,6 +36,22 @@ window.PageHome = {
     const totalStars = allLogsData.length;
     const totalPearls = Math.floor(totalStars / Math.max(totalToday, 1));
 
+    // RPG Progression & Attributes
+    const profile = await DB.profile.get();
+    const currentXp = profile?.xp ?? user?.xp ?? 0;
+    const currentLevel = (typeof levelFromXp === 'function' ? levelFromXp(currentXp) : (DB.levelFromXp ? DB.levelFromXp(currentXp) : Math.floor(Math.sqrt(currentXp / 50)) + 1));
+    this._currentLevel = currentLevel;
+    const xpForCurrent = (typeof xpForLevel === 'function' ? xpForLevel(currentLevel) : (DB.xpForLevel ? DB.xpForLevel(currentLevel) : Math.pow(currentLevel - 1, 2) * 50));
+    const xpForNext = (typeof xpForLevel === 'function' ? xpForLevel(currentLevel + 1) : (DB.xpForLevel ? DB.xpForLevel(currentLevel + 1) : Math.pow(currentLevel, 2) * 50));
+    const xpIntoLevel = Math.max(0, currentXp - xpForCurrent);
+    const xpNeededForLevel = Math.max(1, xpForNext - xpForCurrent);
+    const xpProgressPct = Math.min(100, Math.max(0, Math.round((xpIntoLevel / xpNeededForLevel) * 100)));
+
+    const intellectVal = profile?.attr_intellect ?? profile?.intellect ?? user?.attr_intellect ?? user?.intellect ?? 0;
+    const strengthVal = profile?.attr_strength ?? profile?.strength ?? user?.attr_strength ?? user?.strength ?? 0;
+    const disciplineVal = profile?.attr_discipline ?? profile?.discipline ?? user?.attr_discipline ?? user?.discipline ?? 0;
+    const creativityVal = profile?.attr_creativity ?? profile?.creativity ?? user?.attr_creativity ?? user?.creativity ?? 0;
+
     const hour = new Date().getHours();
     const greeting = hour < 12 ? 'Good Morning' : hour < 17 ? 'Good Afternoon' : 'Good Evening';
     const name = user?.fullName || user?.full_name || user?.email?.split('@')[0] || 'Explorer';
@@ -59,6 +76,52 @@ window.PageHome = {
         <div class="date-strip">
           <div class="date-today">${dateStr}</div>
           <div class="daily-quote">${quote}</div>
+        </div>
+      </div>
+
+      <!-- XP Progression Card -->
+      <div class="xp-progression-card card">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;flex-wrap:wrap;gap:8px;">
+          <div style="display:flex;align-items:center;gap:10px;">
+            <span class="level-badge" style="background:linear-gradient(135deg,var(--teal-dark),var(--teal));color:#060e1a;font-weight:700;font-size:13px;padding:4px 12px;border-radius:20px;font-family:var(--font-heading);">
+              Level ${currentLevel}
+            </span>
+            <strong style="font-size:15px;color:var(--text-primary);">Life RPG Progression</strong>
+          </div>
+          <div style="font-size:13px;color:var(--text-secondary);font-weight:600;">
+            ${currentXp} / ${xpForNext} XP
+          </div>
+        </div>
+        <div class="xp-bar-track">
+          <div class="xp-bar-fill" style="width:${xpProgressPct}%;"></div>
+        </div>
+      </div>
+
+      <!-- Attributes Row -->
+      <div class="home-row home-row-attributes">
+        <div class="stat-card" style="padding:16px;">
+          <div class="stat-icon teal" style="width:36px;height:36px;font-size:16px;margin-bottom:4px;"><i class="fa-solid fa-brain"></i></div>
+          <div class="stat-label">Intellect</div>
+          <div class="stat-value" style="font-size:22px;color:var(--teal-light);">${intellectVal}</div>
+          <div class="stat-sub" style="font-size:11px;">Knowledge & Focus</div>
+        </div>
+        <div class="stat-card" style="padding:16px;">
+          <div class="stat-icon gold" style="width:36px;height:36px;font-size:16px;margin-bottom:4px;"><i class="fa-solid fa-dumbbell"></i></div>
+          <div class="stat-label">Strength</div>
+          <div class="stat-value" style="font-size:22px;color:var(--gold);">${strengthVal}</div>
+          <div class="stat-sub" style="font-size:11px;">Physical & Stamina</div>
+        </div>
+        <div class="stat-card" style="padding:16px;">
+          <div class="stat-icon teal" style="width:36px;height:36px;font-size:16px;margin-bottom:4px;"><i class="fa-solid fa-shield-halved"></i></div>
+          <div class="stat-label">Discipline</div>
+          <div class="stat-value" style="font-size:22px;color:var(--teal);">${disciplineVal}</div>
+          <div class="stat-sub" style="font-size:11px;">Consistency & Will</div>
+        </div>
+        <div class="stat-card" style="padding:16px;">
+          <div class="stat-icon gold" style="width:36px;height:36px;font-size:16px;margin-bottom:4px;"><i class="fa-solid fa-wand-magic-sparkles"></i></div>
+          <div class="stat-label">Creativity</div>
+          <div class="stat-value" style="font-size:22px;color:var(--gold);">${creativityVal}</div>
+          <div class="stat-sub" style="font-size:11px;">Innovation & Flow</div>
         </div>
       </div>
 
@@ -171,25 +234,114 @@ window.PageHome = {
   },
 
   async toggleHabit(habitId, date, el) {
-    const completed = await DB.logs.toggle(habitId, date);
-    const card = el.closest ? el : el;
-    if (completed) {
+    const card = el.closest ? (el.closest('.habit-card-sm') || el) : el;
+    const wasCompleted = card.classList.contains('completed');
+    const willBeCompleted = !wasCompleted;
+
+    // Optimistic UI update immediately
+    if (willBeCompleted) {
       card.classList.add('completed');
-      App.toast('Habit completed! ⭐ +1 Star Shell', 'success');
     } else {
       card.classList.remove('completed');
-      App.toast('Habit marked incomplete', 'warning');
     }
-    // Re-count
-    const logs  = await DB.logs.getForDate(date);
-    const habits = await DB.habits.getAll();
-    const active = habits.filter(h => h.isActive !== false);
-    const completed_count = logs.length;
-    document.querySelectorAll('.stat-value').forEach(el => {
-      if (el.textContent.includes('/')) {
-        el.innerHTML = `${completed_count}/${active.length}`;
+
+    try {
+      // Find habit to get attribute
+      const habits = await DB.habits.getAll();
+      const habit = habits.find(h => h.id === habitId);
+      const attribute = habit ? (habit.attribute || null) : null;
+
+      // Run DB log toggle
+      const completed = await DB.logs.toggle(habitId, date);
+
+      // Award or deduct XP alongside completion state
+      const xpAmount = completed ? 10 : -10;
+      const xpResult = await DB.stats.awardXp(xpAmount, attribute);
+
+      if (completed) {
+        card.classList.add('completed');
+        App.toast('Habit completed! ⭐ +1 Star Shell', 'success');
+      } else {
+        card.classList.remove('completed');
+        App.toast('Habit marked incomplete', 'warning');
       }
-    });
+
+      // Check for Level Up
+      if (xpResult && typeof xpResult.new_level === 'number') {
+        const prevLevel = PageHome._currentLevel || 1;
+        if (xpResult.new_level > prevLevel) {
+          PageHome._currentLevel = xpResult.new_level;
+          PageHome.triggerLevelUp(xpResult.new_level);
+        } else {
+          PageHome._currentLevel = xpResult.new_level;
+        }
+      }
+
+      // Re-count stats
+      const logs = await DB.logs.getForDate(date);
+      const active = habits.filter(h => h.isActive !== false);
+      const completed_count = logs.length;
+      document.querySelectorAll('.stat-value').forEach(statEl => {
+        if (statEl.textContent.includes('/')) {
+          statEl.innerHTML = `${completed_count}/${active.length}`;
+        }
+      });
+    } catch (err) {
+      // Revert visual state on error
+      if (wasCompleted) {
+        card.classList.add('completed');
+      } else {
+        card.classList.remove('completed');
+      }
+      App.toast('Error updating habit: ' + (err.message || err), 'error');
+    }
+  },
+
+  triggerLevelUp(newLevel) {
+    App.toast(`Level Up! You reached Level ${newLevel}! 🎉`, 'success', 4500);
+
+    // Create celebration particle burst
+    const container = document.createElement('div');
+    container.className = 'levelup-burst-container';
+
+    // Spawn 35 colorful glowing celebration particles
+    const colors = ['#00d4c8', '#4de8e0', '#f4c430', '#ffffff', '#e8d5c4', '#00b4d8'];
+    const count = 35;
+
+    for (let i = 0; i < count; i++) {
+      const p = document.createElement('div');
+      p.className = 'levelup-particle';
+      const angle = (Math.PI * 2 * i) / count + (Math.random() * 0.4 - 0.2);
+      const distance = 120 + Math.random() * 260;
+      const tx = Math.cos(angle) * distance;
+      const ty = Math.sin(angle) * distance - 40;
+      const size = 6 + Math.random() * 10;
+      const color = colors[Math.floor(Math.random() * colors.length)];
+      const rot = (Math.random() - 0.5) * 720;
+      const isSquare = Math.random() > 0.5;
+
+      p.style.setProperty('--tx', `${tx}px`);
+      p.style.setProperty('--ty', `${ty}px`);
+      p.style.setProperty('--size', `${size}px`);
+      p.style.setProperty('--color', color);
+      p.style.setProperty('--rot', `${rot}deg`);
+      p.style.setProperty('--radius', isSquare ? '2px' : '50%');
+      p.style.animationDelay = `${Math.random() * 0.15}s`;
+
+      container.appendChild(p);
+    }
+
+    document.body.appendChild(container);
+
+    // Clean up DOM after animation completes (non-accumulating)
+    setTimeout(() => {
+      container.remove();
+    }, 2200);
+
+    // Re-render home to update level badge and XP bar
+    setTimeout(() => {
+      this.render();
+    }, 400);
   },
 
   async renderMiniCal(year, month) {

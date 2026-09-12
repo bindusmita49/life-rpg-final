@@ -347,6 +347,33 @@ h1, h2, h3, h4 {
 }
 .card-value.teal { color: var(--teal); }
 
+/* ── XP Progression Card ─────────────────────────────── */
+.xp-progression-card {
+  background: var(--ocean-card);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid var(--card-border);
+  border-radius: var(--radius);
+  padding: 20px;
+  box-shadow: var(--shadow);
+  margin-bottom: 16px;
+}
+
+.xp-bar-track {
+  height: 10px;
+  border-radius: 999px;
+  background: rgba(255,255,255,0.08);
+  overflow: hidden;
+  position: relative;
+}
+
+.xp-bar-fill {
+  height: 100%;
+  border-radius: 999px;
+  background: linear-gradient(90deg, var(--teal), var(--gold));
+  transition: width 0.6s cubic-bezier(.4,1.4,.6,1);
+}
+
 /* ── Stat Cards ──────────────────────────────────────── */
 .stat-card {
   background: var(--ocean-card);
@@ -627,9 +654,10 @@ h1, h2, h3, h4 {
   display: grid; gap: 16px;
   margin-bottom: 20px;
 }
-.home-row-top    { grid-template-columns: 1fr 1fr auto; }
-.home-row-stats  { grid-template-columns: repeat(4, 1fr); }
-.home-row-bottom { grid-template-columns: 1fr 260px; }
+.home-row-top        { grid-template-columns: 1fr 1fr auto; }
+.home-row-stats      { grid-template-columns: repeat(4, 1fr); }
+.home-row-attributes { grid-template-columns: repeat(4, 1fr); }
+.home-row-bottom     { grid-template-columns: 1fr 260px; }
 
 @media (max-width: 1200px) {
   .home-row-top   { grid-template-columns: 1fr 1fr; }
@@ -639,6 +667,9 @@ h1, h2, h3, h4 {
 @media (max-width: 900px) {
   .home-row-top { grid-template-columns: 1fr; }
 }
+@media (max-width: 640px) {
+  .home-row-attributes { grid-template-columns: repeat(2, 1fr); }
+}
 
 /* ── Streak fire ─────────────────────────────────────── */
 .streak-value {
@@ -646,3 +677,41 @@ h1, h2, h3, h4 {
   font-family: 'Playfair Display', serif;
 }
 .streak-fire { font-size: 20px; }
+
+/* ── Level Up Celebration Burst ───────────────────────── */
+.levelup-burst-container {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 9999;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.levelup-particle {
+  position: absolute;
+  width: var(--size, 10px);
+  height: var(--size, 10px);
+  border-radius: var(--radius, 50%);
+  background: var(--color, var(--teal));
+  box-shadow: 0 0 12px var(--color, var(--teal-glow));
+  opacity: 0;
+  transform: translate(0, 0) scale(0.5);
+  animation: levelupBurst 1.8s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+}
+
+@keyframes levelupBurst {
+  0% {
+    opacity: 1;
+    transform: translate(0, 0) scale(1) rotate(0deg);
+  }
+  60% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: translate(var(--tx, 0px), var(--ty, 0px)) scale(var(--end-scale, 0.4)) rotate(var(--rot, 360deg));
+  }
+}
