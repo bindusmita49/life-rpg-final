@@ -31,6 +31,20 @@ function isDemo() {
   return (typeof DEMO_MODE !== 'undefined' && DEMO_MODE === true) || LS.get('is_demo') === true;
 }
 
+// ── Level & XP helpers ────────────────────────────────
+function levelFromXp(xp) {
+  return Math.floor(Math.sqrt((xp || 0) / 50)) + 1;
+}
+
+function xpForLevel(level) {
+  return Math.pow((level || 1) - 1, 2) * 50;
+}
+
+if (typeof window !== 'undefined') {
+  window.levelFromXp = levelFromXp;
+  window.xpForLevel = xpForLevel;
+}
+
 // ── Default demo habits ───────────────────────────────
 const DEFAULT_HABITS = [
   { id: 'h1', name: 'Drink Water',    icon: '💧', description: '8 glasses',  frequency: 'daily', reminderTime: '08:00', color: '#00b4d8', isActive: true, createdAt: '2025-01-01' },
@@ -72,6 +86,8 @@ function seedDemoData() {
 // ══════════════════════════════════════════════════════
 window.DB = {
   isDemo,
+  levelFromXp,
+  xpForLevel,
 
   // ── Auth ────────────────────────────────────────────
   auth: {
@@ -471,6 +487,96 @@ window.DB = {
         else if (d > 0) break;
       }
       return streak;
+    },
+
+    async awardXp(amount, attribute) {
+      if (isDemo()) {
+        const user = LS.get('user') || { id: 'demo', email: 'demo@habitflow.app', fullName: 'Life RPG Explorer' };
+        user.xp = Math.max(0, (user.xp || 0) + amount);
+        user.gold = Math.max(0, (user.gold || 0) + amount);
+        if (attribute) {
+          const attrKey = 'attr_' + attribute;
+          user[attrKey] = Math.max(0, (user[attrKey] || 0) + amount);
+        }
+        LS.set('user', user);
+        return {
+          new_xp: user.xp,
+          new_gold: user.gold,
+          new_level: levelFromXp(user.xp),
+        };
+      }
+
+      const client = getClient();
+      if (!client) throw new Error('Supabase client is not loaded');
+      const { data, error } = await client.rpc('award_xp', {
+        p_amount: amount,
+        p_attribute: attribute,
+      });
+      if (error) throw error;
+      return (data && Array.isArray(data) && data[0] !== undefined) ? data[0] : data;
+    },
+  },
+
+  // ── Shop ─────────────────────────────────────────────
+  shop: {
+    async list() {
+      if (isDemo()) {
+        return [
+          { id: 'item_golden_anchor', name: 'Golden Anchor Badge', cost: 50, type: 'badge', description: 'Golden Anchor Badge', icon: '⚓' },
+          { id: 'item_deep_sea_theme', name: 'Deep Sea Theme', cost: 100, type: 'theme', description: 'Deep Sea Theme', icon: '🌊' },
+          { id: 'item_wave_rider_title', name: 'Wave Rider Title', cost: 75, type: 'title', description: 'Wave Rider Title', icon: '🏄' },
+          { id: 'item_pearl_diver_badge', name: 'Pearl Diver Badge', cost: 150, type: 'badge', description: 'Pearl Diver Badge', icon: '🦪' },
+        ];
+      }
+      const client = getClient();
+      if (!client) return [];
+      const { data, error } = await client.from('shop_items').select('*');
+      if (error) throw error;
+      return data || [];
+    },
+
+    async owned() {
+      if (isDemo()) {
+        return LS.get('owned_items', []);
+      }
+      const client = getClient();
+      if (!client) return [];
+      const { data: uData } = await client.auth.getUser();
+      if (!uData?.user?.id) return [];
+      const { data, error } = await client.from('owned_items').select('*').eq('user_id', uData.user.id);
+      if (error) throw error;
+      return data || [];
+    },
+
+    async purchase(itemId) {
+      if (isDemo()) {
+        const items = await this.list();
+        const item = items.find(i => i.id === itemId || String(i.id) === String(itemId) || i.name === itemId);
+        if (!item) {
+          throw new Error('Item not found');
+        }
+        const ownedList = LS.get('owned_items', []);
+        const isOwned = ownedList.some(o => (typeof o === 'string' ? o === item.id : (o.item_id === item.id || o.id === item.id)));
+        if (isOwned) {
+          throw new Error('Already owned');
+        }
+        const user = LS.get('user') || { id: 'demo', email: 'demo@habitflow.app', fullName: 'Life RPG Explorer', xp: 0, gold: 0 };
+        const currentGold = user.gold || 0;
+        if (currentGold < item.cost) {
+          throw new Error('Not enough gold');
+        }
+        user.gold = currentGold - item.cost;
+        LS.set('user', user);
+        ownedList.push(item.id);
+        LS.set('owned_items', ownedList);
+        return { success: true, item_id: item.id, remaining_gold: user.gold };
+      }
+
+      const client = getClient();
+      if (!client) throw new Error('Supabase client is not loaded');
+      const { data, error } = await client.rpc('purchase_item', { p_item_id: itemId });
+      if (error) throw error;
+      return data;
     },
   },
 };
