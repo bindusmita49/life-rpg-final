@@ -59,7 +59,19 @@ const DEFAULT_HABITS = [
 // ── Seed demo data ────────────────────────────────────
 function seedDemoData() {
   if (LS.get('seeded')) return;
-  LS.set('user', { id: 'demo', email: 'demo@habitflow.app', fullName: 'Life RPG Explorer', avatar: null });
+  LS.set('user', {
+    id: 'demo',
+    email: 'demo@habitflow.app',
+    fullName: 'Life RPG Explorer',
+    full_name: 'Life RPG Explorer',
+    avatar: null,
+    preferences: {
+      'pref-reminders': true,
+      'pref-streaks': true,
+      'pref-weekly': true,
+      'pref-compact': false,
+    },
+  });
   LS.set('habits', DEFAULT_HABITS);
 
   // Generate realistic log history for last 30 days
@@ -197,19 +209,38 @@ window.DB = {
   // ── Profile ─────────────────────────────────────────
   profile: {
     async get() {
-      if (isDemo()) return LS.get('user');
+      const defaultPrefs = {
+        'pref-reminders': true,
+        'pref-streaks': true,
+        'pref-weekly': true,
+        'pref-compact': false,
+      };
+      if (isDemo()) {
+        const u = LS.get('user') || {};
+        if (!u.preferences) {
+          u.preferences = defaultPrefs;
+          LS.set('user', u);
+        }
+        return u;
+      }
       const client = getClient();
       if (!client) return null;
       const { data: uData } = await client.auth.getUser();
       const uid = uData?.user?.id;
       if (!uid) return null;
       const { data: p } = await client.from('profiles').select('*').eq('id', uid).maybeSingle();
-      if (p) return p;
+      if (p) {
+        if (!p.preferences) {
+          p.preferences = defaultPrefs;
+        }
+        return p;
+      }
       return {
         id: uid,
         full_name: uData.user.user_metadata?.full_name || uData.user.email?.split('@')[0] || 'Explorer',
         email: uData.user.email,
         avatar_url: null,
+        preferences: defaultPrefs,
       };
     },
 

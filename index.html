@@ -67,6 +67,41 @@
       .auth-form-side {
         max-width: 100%;
       }
+    .input-wrap > i {
+      position: absolute;
+      left: 16px;
+      color: var(--teal);
+      font-size: 15px;
+      pointer-events: none;
+    }
+    .input-wrap input {
+      padding-right: 42px;
+    }
+    .input-wrap .toggle-pw {
+      position: absolute;
+      right: 14px;
+      top: 50%;
+      transform: translateY(-50%);
+      background: none;
+      border: none;
+      color: var(--text-muted);
+      cursor: pointer;
+      font-size: 15px;
+      padding: 6px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 2;
+    }
+    .input-wrap .toggle-pw i {
+      position: static;
+      left: auto;
+      color: var(--text-muted);
+      pointer-events: none;
+      transition: color .2s;
+    }
+    .input-wrap .toggle-pw:hover i {
+      color: var(--teal);
     }
   </style>
 </head>
@@ -144,7 +179,7 @@
               <div class="input-wrap">
                 <i class="fa-solid fa-lock"></i>
                 <input type="password" id="auth-pass" placeholder="Your password" autocomplete="off" required>
-                <button type="button" class="toggle-pw"><i class="fa-solid fa-eye-slash"></i></button>
+                <button type="button" class="toggle-pw" aria-label="Toggle password visibility"><i class="fa-solid fa-eye"></i></button>
               </div>
             </div>
 

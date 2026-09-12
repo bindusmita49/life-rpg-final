@@ -9,8 +9,15 @@ window.PageSettings = {
   async render() {
     const section = document.getElementById('content-settings');
     const user    = await DB.auth.getUser();
-    const name    = user?.fullName || user?.full_name || user?.email?.split('@')[0] || 'Explorer';
+    const profile = await DB.profile.get();
+    const name    = profile?.full_name || profile?.fullName || user?.fullName || user?.full_name || user?.user_metadata?.full_name || user?.email?.split('@')[0] || 'Explorer';
     const initial = name[0]?.toUpperCase() || 'U';
+
+    const prefs = profile?.preferences || {};
+    const remindersChecked = prefs['pref-reminders'] !== undefined ? prefs['pref-reminders'] : (localStorage.getItem('hf_pref_pref-reminders') !== null ? localStorage.getItem('hf_pref_pref-reminders') === 'true' : true);
+    const streaksChecked   = prefs['pref-streaks'] !== undefined ? prefs['pref-streaks'] : (localStorage.getItem('hf_pref_pref-streaks') !== null ? localStorage.getItem('hf_pref_pref-streaks') === 'true' : true);
+    const weeklyChecked    = prefs['pref-weekly'] !== undefined ? prefs['pref-weekly'] : (localStorage.getItem('hf_pref_pref-weekly') !== null ? localStorage.getItem('hf_pref_pref-weekly') === 'true' : true);
+    const compactChecked   = prefs['pref-compact'] !== undefined ? prefs['pref-compact'] : (localStorage.getItem('hf_compact') === 'true');
 
     section.innerHTML = `
       <div class="page-hero" style="margin-bottom:24px;">
@@ -127,17 +134,17 @@ window.PageSettings = {
             <div class="settings-section">
               <div class="settings-section-title"><i class="fa-solid fa-bell"></i> Notifications</div>
               ${[
-                ['Daily Reminders', 'Get reminded to complete your habits', 'pref-reminders'],
-                ['Streak Alerts',   'Be notified when you\'re at risk of breaking a streak', 'pref-streaks'],
-                ['Weekly Summary',  'Receive a weekly digest of your progress', 'pref-weekly'],
-              ].map(([title,desc,id]) => `
+                ['Daily Reminders', 'Get reminded to complete your habits', 'pref-reminders', remindersChecked],
+                ['Streak Alerts',   'Be notified when you\'re at risk of breaking a streak', 'pref-streaks', streaksChecked],
+                ['Weekly Summary',  'Receive a weekly digest of your progress', 'pref-weekly', weeklyChecked],
+              ].map(([title,desc,id,checked]) => `
                 <div class="settings-row">
                   <div class="settings-row-info">
                     <strong>${title}</strong>
                     <span>${desc}</span>
                   </div>
                   <label class="toggle">
-                    <input type="checkbox" id="${id}" checked onchange="PageSettings.savePref('${id}',this.checked)">
+                    <input type="checkbox" id="${id}" ${checked ? 'checked' : ''} onchange="PageSettings.savePref('${id}',this.checked)">
                     <span class="toggle-slider"></span>
                   </label>
                 </div>`).join('')}
@@ -157,7 +164,7 @@ window.PageSettings = {
                   <span>Reduce spacing and card sizes</span>
                 </div>
                 <label class="toggle">
-                  <input type="checkbox" id="pref-compact" onchange="PageSettings.toggleCompact(this.checked)">
+                  <input type="checkbox" id="pref-compact" ${compactChecked ? 'checked' : ''} onchange="PageSettings.toggleCompact(this.checked)">
                   <span class="toggle-slider"></span>
                 </label>
               </div>
@@ -224,17 +231,30 @@ window.PageSettings = {
   },
 
   async saveProfile() {
-    const name  = document.getElementById('setting-name')?.value.trim();
-    const email = document.getElementById('setting-email')?.value.trim();
+    const name = document.getElementById('setting-name')?.value.trim();
     if (!name) { App.toast('Name cannot be empty', 'error'); return; }
     try {
-      await DB.profile.update({ fullName: name, email });
+      const updates = { full_name: name };
+      if (typeof DEMO_MODE !== 'undefined' && DEMO_MODE) {
+        updates.fullName = name;
+      }
+      await DB.profile.update(updates);
       App.toast('Profile saved! ✨', 'success');
-      // Update header
+
+      // Update UI immediately
+      const initial = name[0].toUpperCase();
+      const headerAvatarText = document.getElementById('header-avatar-text');
+      if (headerAvatarText) headerAvatarText.textContent = initial;
+
+      const settingsAvatar = document.getElementById('settings-avatar');
+      if (settingsAvatar && !settingsAvatar.querySelector('img')) {
+        settingsAvatar.textContent = initial;
+      }
+
       const el = document.querySelector('.profile-info strong');
       if (el) el.textContent = name;
-      const av = document.querySelector('.profile-avatar');
-      if (av) av.textContent = name[0].toUpperCase();
+      const headerName = document.getElementById('header-profile-name');
+      if (headerName) headerName.textContent = name;
     } catch (e) {
       App.toast('Error: ' + e.message, 'error');
     }
@@ -256,14 +276,16 @@ window.PageSettings = {
     reader.readAsDataURL(file);
   },
 
-  removeAvatar() {
+  async removeAvatar() {
     localStorage.removeItem('hf_avatar');
-    const user = JSON.parse(localStorage.getItem('hf_user') || '{}');
-    const initial = (user.fullName || 'U')[0].toUpperCase();
+    const profile = await DB.profile.get();
+    const user = await DB.auth.getUser();
+    const name = profile?.full_name || profile?.fullName || user?.fullName || user?.full_name || 'Explorer';
+    const initial = name[0]?.toUpperCase() || 'U';
     const av = document.getElementById('settings-avatar');
     if (av) av.innerHTML = initial;
     const headerAv = document.querySelector('.profile-avatar');
-    if (headerAv) headerAv.innerHTML = `<img src="" alt="" style="display:none">${initial}`;
+    if (headerAv) headerAv.innerHTML = `<span id="header-avatar-text">${initial}</span>`;
     App.toast('Avatar removed', 'warning');
   },
 
@@ -279,14 +301,31 @@ window.PageSettings = {
     }
   },
 
-  savePref(id, val) {
-    localStorage.setItem('hf_pref_' + id, val);
-    App.toast('Preference saved', 'success');
+  async savePref(id, val) {
+    try {
+      localStorage.setItem('hf_pref_' + id, val);
+      const profile = (await DB.profile.get()) || {};
+      const currentPrefs = profile.preferences || {};
+      const updatedPrefs = { ...currentPrefs, [id]: val };
+      await DB.profile.update({ preferences: updatedPrefs });
+      App.toast('Preference saved', 'success');
+    } catch (e) {
+      App.toast('Error saving preference: ' + e.message, 'error');
+    }
   },
 
-  toggleCompact(on) {
+  async toggleCompact(on) {
     document.body.classList.toggle('compact', on);
     localStorage.setItem('hf_compact', on);
+    try {
+      const profile = (await DB.profile.get()) || {};
+      const currentPrefs = profile.preferences || {};
+      const updatedPrefs = { ...currentPrefs, 'pref-compact': on };
+      await DB.profile.update({ preferences: updatedPrefs });
+      App.toast('Preference saved', 'success');
+    } catch (e) {
+      App.toast('Error saving preference: ' + e.message, 'error');
+    }
   },
 
   exportData() {

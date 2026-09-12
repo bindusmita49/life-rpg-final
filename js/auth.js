@@ -65,13 +65,16 @@ document.querySelectorAll('.auth-tab').forEach(t => {
 
 // ── Toggle password visibility ────────────────────────
 document.querySelectorAll('.toggle-pw').forEach(btn => {
-  btn.addEventListener('click', () => {
-    const inp = btn.previousElementSibling;
+  btn.addEventListener('click', (e) => {
+    e.preventDefault();
+    const inp = btn.previousElementSibling || btn.closest('.input-wrap')?.querySelector('input');
     if (!inp) return;
-    const isText = inp.type === 'text';
-    inp.type = isText ? 'password' : 'text';
+    const isPass = inp.type === 'password';
+    inp.type = isPass ? 'text' : 'password';
     const icon = btn.querySelector('i');
-    if (icon) icon.className = `fa-solid ${isText ? 'fa-eye' : 'fa-eye-slash'}`;
+    if (icon) {
+      icon.className = isPass ? 'fa-solid fa-eye-slash' : 'fa-solid fa-eye';
+    }
   });
 });
 
