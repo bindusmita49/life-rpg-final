@@ -1,0 +1,447 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Life RPG — Turn Your Habits Into a Life RPG</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🌊</text></svg>">
+  <link rel="stylesheet" href="css/auth.css">
+  <!-- Font Awesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <!-- Supabase -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <style>
+    /* ── Landing Page Specific Enhancements ────────────────── */
+    body {
+      overflow-x: hidden;
+      overflow-y: auto;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .landing-header {
+      position: relative;
+      z-index: 10;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 24px 48px;
+      max-width: 1200px;
+      margin: 0 auto;
+      width: 100%;
+    }
+
+    .landing-nav-actions {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .btn-nav-signin {
+      color: var(--text-primary);
+      text-decoration: none;
+      font-weight: 500;
+      font-size: 14px;
+      padding: 8px 18px;
+      border-radius: var(--radius-sm);
+      transition: all .2s;
+    }
+    .btn-nav-signin:hover {
+      background: rgba(255,255,255,.08);
+      color: var(--teal);
+    }
+
+    .landing-main {
+      position: relative;
+      z-index: 5;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 20px 24px 60px;
+      max-width: 1100px;
+      margin: 0 auto;
+      width: 100%;
+    }
+
+    .hero-section {
+      text-align: center;
+      padding: 40px 16px 60px;
+      max-width: 820px;
+    }
+
+    .hero-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(0,212,200,.1);
+      border: 1px solid rgba(0,212,200,.3);
+      color: var(--teal-light);
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      padding: 6px 16px;
+      border-radius: 999px;
+      margin-bottom: 24px;
+      box-shadow: 0 0 20px rgba(0,212,200,.15);
+    }
+
+    .hero-headline {
+      font-family: 'Playfair Display', Georgia, serif;
+      font-size: clamp(34px, 5.5vw, 56px);
+      font-weight: 700;
+      line-height: 1.15;
+      margin-bottom: 20px;
+      letter-spacing: -.02em;
+      background: linear-gradient(135deg, #ffffff 30%, var(--teal-light) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .hero-subheadline {
+      font-size: clamp(15px, 2vw, 18px);
+      color: var(--text-secondary);
+      line-height: 1.6;
+      max-width: 640px;
+      margin: 0 auto 36px;
+    }
+
+    .hero-ctas {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+
+    .btn-cta-primary {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      padding: 14px 32px;
+      background: linear-gradient(135deg, var(--teal) 0%, var(--teal-dark) 100%);
+      color: #060e1a;
+      font-weight: 700;
+      font-size: 15px;
+      border-radius: var(--radius-sm);
+      text-decoration: none;
+      border: none;
+      cursor: pointer;
+      box-shadow: 0 4px 20px var(--teal-glow);
+      transition: all .25s ease;
+    }
+    .btn-cta-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 28px rgba(0,212,200,.5);
+    }
+
+    .btn-cta-demo {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      padding: 14px 28px;
+      background: rgba(255,255,255,.07);
+      border: 1px solid rgba(255,255,255,.15);
+      color: var(--text-primary);
+      font-weight: 600;
+      font-size: 15px;
+      border-radius: var(--radius-sm);
+      text-decoration: none;
+      cursor: pointer;
+      backdrop-filter: blur(12px);
+      transition: all .25s ease;
+    }
+    .btn-cta-demo:hover {
+      background: rgba(255,255,255,.12);
+      border-color: var(--teal);
+      color: var(--teal-light);
+      transform: translateY(-2px);
+    }
+
+    /* ── How It Works Section ─────────────────────────────── */
+    .how-it-works {
+      width: 100%;
+      margin-top: 20px;
+      padding-top: 40px;
+      border-top: 1px solid rgba(255,255,255,.07);
+      text-align: center;
+    }
+
+    .section-tag {
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: .12em;
+      color: var(--teal);
+      text-transform: uppercase;
+      margin-bottom: 8px;
+    }
+
+    .section-title {
+      font-family: 'Playfair Display', Georgia, serif;
+      font-size: clamp(24px, 3.5vw, 34px);
+      font-weight: 700;
+      margin-bottom: 36px;
+    }
+
+    .cards-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 24px;
+      text-align: left;
+    }
+
+    .feature-card {
+      background: var(--glass);
+      border: 1px solid var(--card-border);
+      border-radius: var(--radius);
+      padding: 32px 28px;
+      backdrop-filter: blur(16px);
+      box-shadow: var(--shadow);
+      transition: transform .25s ease, border-color .25s ease, box-shadow .25s ease;
+      position: relative;
+      overflow: hidden;
+    }
+    .feature-card:hover {
+      transform: translateY(-4px);
+      border-color: rgba(0,212,200,.3);
+      box-shadow: 0 12px 40px rgba(0,0,0,.5), 0 0 20px rgba(0,212,200,.1);
+    }
+
+    .card-icon {
+      width: 52px;
+      height: 52px;
+      border-radius: 14px;
+      background: rgba(0,212,200,.12);
+      border: 1px solid rgba(0,212,200,.25);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 22px;
+      color: var(--teal);
+      margin-bottom: 20px;
+    }
+    .feature-card:nth-child(2) .card-icon {
+      background: rgba(244,196,48,.12);
+      border-color: rgba(244,196,48,.25);
+      color: var(--gold);
+    }
+    .feature-card:nth-child(3) .card-icon {
+      background: rgba(77,232,224,.12);
+      border-color: rgba(77,232,224,.25);
+      color: var(--teal-light);
+    }
+
+    .card-title {
+      font-size: 19px;
+      font-weight: 600;
+      margin-bottom: 10px;
+      color: var(--text-primary);
+    }
+
+    .card-desc {
+      font-size: 14px;
+      color: var(--text-secondary);
+      line-height: 1.55;
+    }
+
+    /* ── Footer ───────────────────────────────────────────── */
+    .landing-footer {
+      position: relative;
+      z-index: 10;
+      text-align: center;
+      padding: 32px 24px;
+      color: var(--text-muted);
+      font-size: 13px;
+      border-top: 1px solid rgba(255,255,255,.05);
+      background: rgba(6,14,26,.6);
+      backdrop-filter: blur(8px);
+    }
+
+    .landing-footer span {
+      color: var(--teal);
+      font-weight: 600;
+    }
+
+    @media (max-width: 640px) {
+      .landing-header { padding: 20px; }
+      .hero-section { padding: 20px 0 40px; }
+      .hero-ctas { flex-direction: column; width: 100%; }
+      .btn-cta-primary, .btn-cta-demo { width: 100%; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Ocean Background -->
+  <div class="ocean-scene">
+    <div class="rays" id="landing-rays"></div>
+    <div class="bubbles" id="landing-bubbles"></div>
+  </div>
+
+  <!-- Header / Navigation -->
+  <header class="landing-header">
+    <a href="landing.html" class="auth-logo" style="text-decoration:none;color:inherit;">
+      <div class="auth-logo-icon">🌊</div>
+      <div class="auth-logo-text">
+        <h1>Life RPG</h1>
+        <p>Small Steps · Big Changes</p>
+      </div>
+    </a>
+
+    <div class="landing-nav-actions">
+      <a href="index.html" class="btn-nav-signin" id="nav-signin-link">Sign In</a>
+      <a href="index.html" class="btn-cta-primary" style="padding: 9px 20px; font-size: 13px;">Get Started</a>
+    </div>
+  </header>
+
+  <!-- Main Landing Content -->
+  <main class="landing-main">
+
+    <!-- Hero Section -->
+    <section class="hero-section">
+      <div class="hero-badge">
+        <i class="fa-solid fa-gamepad"></i> Level Up Your Daily Routine
+      </div>
+
+      <h1 class="hero-headline">
+        Turn Your Habits Into a Life RPG
+      </h1>
+
+      <p class="hero-subheadline">
+        Embark on a daily quest of personal growth. Track habits, sustain streaks, collect rare ocean treasures, and unlock deep insights in a calming deep-sea world.
+      </p>
+
+      <div class="hero-ctas">
+        <a href="index.html" class="btn-cta-primary" id="btn-hero-start">
+          Get Started <i class="fa-solid fa-arrow-right"></i>
+        </a>
+        <button type="button" class="btn-cta-demo" id="btn-hero-demo">
+          <i class="fa-solid fa-fish"></i> Try Demo (Instant Access)
+        </button>
+      </div>
+    </section>
+
+    <!-- How It Works Section -->
+    <section class="how-it-works">
+      <p class="section-tag">HOW IT WORKS</p>
+      <h2 class="section-title">Three Simple Steps to Master Your Routine</h2>
+
+      <div class="cards-grid">
+        <!-- Card 1 -->
+        <div class="feature-card">
+          <div class="card-icon">
+            <i class="fa-solid fa-list-check"></i>
+          </div>
+          <h3 class="card-title">Track Your Habits</h3>
+          <p class="card-desc">Log your daily routines with a single click and keep complete control over your daily self-improvement goals.</p>
+        </div>
+
+        <!-- Card 2 -->
+        <div class="feature-card">
+          <div class="card-icon">
+            <i class="fa-solid fa-fire"></i>
+          </div>
+          <h3 class="card-title">Build Your Streak</h3>
+          <p class="card-desc">Stay consistent day after day to build momentum, multiply your streaks, and unlock special badges and star shells.</p>
+        </div>
+
+        <!-- Card 3 -->
+        <div class="feature-card">
+          <div class="card-icon">
+            <i class="fa-solid fa-chart-line"></i>
+          </div>
+          <h3 class="card-title">See Your Progress</h3>
+          <p class="card-desc">Visualize your growth with comprehensive analytics, completion charts, and monthly habit calendars.</p>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Footer -->
+  <footer class="landing-footer">
+    <span>Life RPG</span> — One habit at a time, you're building a better you 🌊
+  </footer>
+
+  <!-- Scripts -->
+  <script src="js/config.js"></script>
+  <script src="js/db.js"></script>
+  <script>
+    // ── Ocean bubbles & rays ──────────────────────────────
+    (function buildOceanEffects() {
+      const wrap = document.getElementById('landing-bubbles');
+      if (wrap) {
+        for (let i = 0; i < 24; i++) {
+          const b = document.createElement('div');
+          b.className = 'bubble';
+          const size = 3 + Math.random() * 20;
+          b.style.cssText = `
+            width:${size}px; height:${size}px;
+            left:${Math.random()*100}%;
+            animation-duration:${10+Math.random()*18}s;
+            animation-delay:${-Math.random()*18}s;
+          `;
+          wrap.appendChild(b);
+        }
+      }
+
+      const rays = document.getElementById('landing-rays');
+      if (rays) {
+        [15, 32, 50, 68, 85].forEach((l, i) => {
+          const r = document.createElement('span');
+          r.style.cssText = `position:absolute;top:-10%;left:${l}%;width:${1.5+i*.5}px;height:130%;
+            background:linear-gradient(180deg,rgba(0,212,200,.5) 0%,transparent 75%);
+            transform-origin:top center;opacity:${.25+i*.08};
+            animation:rayWave ${8+i*2}s ease-in-out infinite alternate;
+            --r:${i%2===0?6:-6};`;
+          rays.appendChild(r);
+        });
+      }
+    })();
+
+    // ── Try Demo button handler ───────────────────────────
+    const demoBtn = document.getElementById('btn-hero-demo');
+    if (demoBtn) {
+      demoBtn.addEventListener('click', async () => {
+        demoBtn.disabled = true;
+        const originalHtml = demoBtn.innerHTML;
+        demoBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Launching Demo...';
+        try {
+          await DB.auth.login('demo@habitflow.app', 'demo1234');
+          setTimeout(() => {
+            window.location.href = 'app.html';
+          }, 500);
+        } catch (err) {
+          demoBtn.disabled = false;
+          demoBtn.innerHTML = originalHtml;
+          alert('Could not start demo: ' + (err.message || err));
+        }
+      });
+    }
+
+    // ── Check if already logged in ────────────────────────
+    (async () => {
+      try {
+        const u = await DB.auth.getUser();
+        if (u) {
+          const startBtn = document.getElementById('btn-hero-start');
+          if (startBtn) {
+            startBtn.innerHTML = 'Go to Dashboard <i class="fa-solid fa-arrow-right"></i>';
+            startBtn.href = 'app.html';
+          }
+          const signinNav = document.getElementById('nav-signin-link');
+          if (signinNav) {
+            signinNav.textContent = 'Dashboard';
+            signinNav.href = 'app.html';
+          }
+        }
+      } catch (e) {}
+    })();
+  </script>
+
+</body>
+</html>

@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Life RPG — Login</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🌊</text></svg>">
+  <link rel="stylesheet" href="css/auth.css">
+  <!-- Font Awesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+</head>
+<body>
+
+  <!-- Ocean Background -->
+  <div class="ocean-scene">
+    <div class="rays" id="auth-rays"></div>
+    <div class="bubbles" id="auth-bubbles"></div>
+  </div>
+
+  <!-- Auth Card -->
+  <div class="auth-wrapper">
+    <div class="auth-card">
+
+      <!-- Logo -->
+      <a href="landing.html" class="auth-logo" style="text-decoration:none;color:inherit;">
+        <div class="auth-logo-icon">🌊</div>
+        <div class="auth-logo-text">
+          <h1>Life RPG</h1>
+          <p>Small Steps · Big Changes</p>
+        </div>
+      </a>
+
+      <!-- Heading -->
+      <h2 class="auth-heading" id="auth-heading">Welcome Back <span>🌊</span></h2>
+      <p class="auth-sub" id="auth-sub">Sign in to continue your journey.</p>
+
+      <!-- Tab Toggle -->
+      <div class="auth-tabs">
+        <button class="auth-tab active" data-mode="login">Sign In</button>
+        <button class="auth-tab"        data-mode="signup">Create Account</button>
+      </div>
+
+      <!-- Alert -->
+      <div class="auth-alert" id="auth-alert"></div>
+
+      <!-- Form -->
+      <form class="auth-form" id="auth-form">
+
+        <!-- Name (signup only) -->
+        <div class="form-group" id="signup-name-group" style="display:none;flex-direction:column;gap:8px">
+          <label for="auth-name">Full Name</label>
+          <div class="input-wrap">
+            <i class="fa-solid fa-user"></i>
+            <input type="text" id="auth-name" placeholder="Your full name" autocomplete="name">
+          </div>
+        </div>
+
+        <!-- Email -->
+        <div class="form-group">
+          <label for="auth-email">Email Address</label>
+          <div class="input-wrap">
+            <i class="fa-solid fa-envelope"></i>
+            <input type="email" id="auth-email" placeholder="you@example.com" autocomplete="email" required>
+          </div>
+        </div>
+
+        <!-- Password -->
+        <div class="form-group">
+          <label for="auth-pass">Password</label>
+          <div class="input-wrap">
+            <i class="fa-solid fa-lock"></i>
+            <input type="password" id="auth-pass" placeholder="Your password" autocomplete="current-password" required>
+            <button type="button" class="toggle-pw"><i class="fa-solid fa-eye-slash"></i></button>
+          </div>
+        </div>
+
+        <!-- Submit -->
+        <button type="submit" class="btn-auth" id="auth-btn">
+          <span class="btn-text" id="auth-btn-text">Sign In</span>
+          <div class="btn-spinner"></div>
+        </button>
+
+        <!-- Divider -->
+        <div class="auth-divider">or try without an account</div>
+
+        <!-- Demo mode -->
+        <button type="button" class="btn-demo" id="btn-demo">
+          <i class="fa-solid fa-fish"></i> &nbsp; Enter Demo Mode — No signup needed
+        </button>
+
+      </form>
+
+      <!-- Footer -->
+      <div class="auth-footer">
+        <span>Life RPG</span> — One habit at a time, you're building a better you 🌊
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/config.js"></script>
+  <script src="js/db.js"></script>
+  <script>
+    // Redirect if already logged in with a valid session
+    (async () => {
+      try {
+        const u = await DB.auth.getUser();
+        if (u) window.location.replace('app.html');
+      } catch (e) {
+        console.warn('Session check:', e);
+      }
+    })();
+  </script>
+  <script src="js/auth.js"></script>
+
+</body>
+</html>
