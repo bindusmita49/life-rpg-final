@@ -21,7 +21,7 @@ window.PageSettings = {
         <h2 style="font-family:'Playfair Display',serif;font-size:32px;font-weight:700;">
           Your Account <span style="color:var(--teal);font-weight:400">~</span>
         </h2>
-        <p style="color:var(--text-secondary);font-size:13.5px;">Manage your profile and preferences.</p>
+        <p style="color:var(--text-secondary);font-size:13.5px;">Manage your profile and account settings.</p>
       </div>
 
       <div class="settings-grid">
@@ -33,9 +33,6 @@ window.PageSettings = {
             </div>
             <div class="settings-nav-item ${this.activePanel==='security'?'active':''}" onclick="PageSettings.showPanel('security')">
               <i class="fa-solid fa-shield"></i> <span>Security</span>
-            </div>
-            <div class="settings-nav-item ${this.activePanel==='preferences'?'active':''}" onclick="PageSettings.showPanel('preferences')">
-              <i class="fa-solid fa-sliders"></i> <span>Preferences</span>
             </div>
             <div class="settings-nav-item ${this.activePanel==='data'?'active':''}" onclick="PageSettings.showPanel('data')">
               <i class="fa-solid fa-database"></i> <span>Data & Privacy</span>
@@ -125,13 +122,7 @@ window.PageSettings = {
             </div>
           </div>
 
-          <!-- Preferences Panel -->
-          <div class="settings-panel ${this.activePanel==='preferences'?'active':''}" id="panel-preferences">
-            <div class="settings-section">
-              <div class="settings-section-title"><i class="fa-solid fa-sliders"></i> Preferences</div>
-              <p style="color:var(--text-secondary);font-size:13.5px;margin:0;">No additional preferences to configure at this time.</p>
-            </div>
-          </div>
+
 
           <!-- Data Panel -->
           <div class="settings-panel ${this.activePanel==='data'?'active':''}" id="panel-data">

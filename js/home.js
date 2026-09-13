@@ -129,13 +129,13 @@ window.PageHome = {
         <div style="display:flex;flex-direction:column;gap:12px;min-width:220px;">
           <div class="card card-sm" style="flex:1">
             <div class="card-title">⭐ Star Shells Today</div>
-            <div style="font-family:'Playfair Display',serif;font-size:28px;font-weight:700;color:var(--gold);">
+            <div id="home-stars-today" style="font-family:'Playfair Display',serif;font-size:28px;font-weight:700;color:var(--gold);">
               ${completedToday}<span style="font-size:16px;color:var(--text-muted);font-family:'Inter',sans-serif;">/${totalToday}</span>
             </div>
           </div>
           <div class="card card-sm" style="flex:1">
             <div class="card-title">🦪 Pearl Oysters</div>
-            <div style="font-family:'Playfair Display',serif;font-size:28px;font-weight:700;color:var(--pearl);">
+            <div id="home-pearl-oysters" style="font-family:'Playfair Display',serif;font-size:28px;font-weight:700;color:var(--pearl);">
               ${completedToday >= totalToday && totalToday > 0 ? '1' : '0'}
             </div>
           </div>
@@ -167,7 +167,7 @@ window.PageHome = {
         <div class="stat-card">
           <div class="stat-icon gold"><i class="fa-solid fa-star"></i></div>
           <div class="stat-label">Total Stars Earned</div>
-          <div class="stat-value" style="color:var(--gold)">${totalStars}</div>
+          <div class="stat-value" id="home-total-stars" style="color:var(--gold)">${totalStars}</div>
           <div class="stat-sub">All time ⭐</div>
         </div>
       </div>
@@ -269,6 +269,32 @@ window.PageHome = {
           statEl.innerHTML = `${completed_count}/${active.length}`;
         }
       });
+
+      // Recalculate total stars and sync gold
+      const { totalStars } = await DB.rewards.calculate();
+      const newGold = await DB.stats.syncGold(totalStars);
+
+      // Update stat and gold displays
+      const starCard = document.getElementById('home-total-stars');
+      if (starCard) {
+        starCard.textContent = totalStars;
+      }
+      const starsTodayEl = document.getElementById('home-stars-today');
+      if (starsTodayEl) {
+        starsTodayEl.innerHTML = `${completed_count}<span style="font-size:16px;color:var(--text-muted);font-family:'Inter',sans-serif;">/${active.length}</span>`;
+      }
+      const pearlsEl = document.getElementById('home-pearl-oysters');
+      if (pearlsEl) {
+        pearlsEl.textContent = (completed_count >= active.length && active.length > 0) ? '1' : '0';
+      }
+      const shopGold = document.getElementById('shop-gold-display');
+      if (shopGold) {
+        shopGold.textContent = `${newGold} Gold`;
+      }
+      const goldDisplay = document.getElementById('user-gold-display');
+      if (goldDisplay) {
+        goldDisplay.textContent = newGold;
+      }
     } catch (err) {
       // Revert visual state on error
       if (wasCompleted) {

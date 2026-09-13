@@ -532,7 +532,6 @@ window.DB = {
       if (isDemo()) {
         const user = LS.get('user') || { id: 'demo', email: 'demo@habitflow.app', fullName: 'Life RPG Explorer' };
         user.xp = Math.max(0, (user.xp || 0) + amount);
-        user.gold = Math.max(0, (user.gold || 0) + amount);
         if (attribute) {
           const attrKey = 'attr_' + attribute;
           user[attrKey] = Math.max(0, (user[attrKey] || 0) + amount);
@@ -540,7 +539,6 @@ window.DB = {
         LS.set('user', user);
         return {
           new_xp: user.xp,
-          new_gold: user.gold,
           new_level: levelFromXp(user.xp),
         };
       }
@@ -553,6 +551,24 @@ window.DB = {
       });
       if (error) throw error;
       return (data && Array.isArray(data) && data[0] !== undefined) ? data[0] : data;
+    },
+
+    async syncGold(totalStars) {
+      if (isDemo()) {
+        const user = LS.get('user') || { id: 'demo', email: 'demo@habitflow.app', fullName: 'Life RPG Explorer' };
+        user.gold = Math.floor((totalStars || 0) / 10);
+        LS.set('user', user);
+        return user.gold;
+      }
+
+      const client = getClient();
+      if (!client) throw new Error('Supabase client is not loaded');
+      const { data, error } = await client.rpc('sync_gold', {
+        p_total_stars: totalStars,
+      });
+      if (error) throw error;
+      const res = (data && Array.isArray(data) && data[0] !== undefined) ? data[0] : data;
+      return (res && typeof res === 'object') ? (res.sync_gold ?? res.new_gold ?? res.gold ?? Object.values(res)[0]) : res;
     },
   },
 
