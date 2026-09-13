@@ -3,6 +3,14 @@
    ========================================================= */
 'use strict';
 
+// Local-date helper — avoids UTC off-by-one for timezones ahead of UTC
+function toLocalDateString(date) {
+  const year  = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const day   = String(date.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
+}
+
 window.PageHabits = {
   filter: 'all',
   editingId: null,
@@ -154,7 +162,7 @@ window.PageHabits = {
       const streak  = DB.stats.getStreak(allLogs, h.id);
       const longest = DB.stats.getLongestStreak(allLogs, h.id);
       const rate    = DB.stats.getCompletionRate(allLogs, h.id, 30);
-      const today   = new Date().toISOString().split('T')[0];
+      const today   = toLocalDateString(new Date());
       const todayLogs = allLogs.filter(l => l.habitId === h.id && l.date === today);
       const done    = todayLogs.length > 0;
       return `

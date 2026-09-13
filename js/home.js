@@ -3,6 +3,14 @@
    ========================================================= */
 'use strict';
 
+// Local-date helper — avoids UTC off-by-one for timezones ahead of UTC
+function toLocalDateString(date) {
+  const year  = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const day   = String(date.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
+}
+
 window.PageHome = {
   _currentLevel: 1,
   quotes: [
@@ -21,7 +29,7 @@ window.PageHome = {
 
     const user   = await DB.auth.getUser();
     const habits = await DB.habits.getAll();
-    const today  = new Date().toISOString().split('T')[0];
+    const today  = toLocalDateString(new Date());
     const logs   = await DB.logs.getForDate(today);
     const allLogs = window.LS ? window.LS.get('logs', []) : [];
 
@@ -98,32 +106,7 @@ window.PageHome = {
       </div>
 
       <!-- Attributes Row -->
-      <div class="home-row home-row-attributes">
-        <div class="stat-card" style="padding:16px;">
-          <div class="stat-icon teal" style="width:36px;height:36px;font-size:16px;margin-bottom:4px;"><i class="fa-solid fa-brain"></i></div>
-          <div class="stat-label">Intellect</div>
-          <div class="stat-value" style="font-size:22px;color:var(--teal-light);">${intellectVal}</div>
-          <div class="stat-sub" style="font-size:11px;">Knowledge & Focus</div>
-        </div>
-        <div class="stat-card" style="padding:16px;">
-          <div class="stat-icon gold" style="width:36px;height:36px;font-size:16px;margin-bottom:4px;"><i class="fa-solid fa-dumbbell"></i></div>
-          <div class="stat-label">Strength</div>
-          <div class="stat-value" style="font-size:22px;color:var(--gold);">${strengthVal}</div>
-          <div class="stat-sub" style="font-size:11px;">Physical & Stamina</div>
-        </div>
-        <div class="stat-card" style="padding:16px;">
-          <div class="stat-icon teal" style="width:36px;height:36px;font-size:16px;margin-bottom:4px;"><i class="fa-solid fa-shield-halved"></i></div>
-          <div class="stat-label">Discipline</div>
-          <div class="stat-value" style="font-size:22px;color:var(--teal);">${disciplineVal}</div>
-          <div class="stat-sub" style="font-size:11px;">Consistency & Will</div>
-        </div>
-        <div class="stat-card" style="padding:16px;">
-          <div class="stat-icon gold" style="width:36px;height:36px;font-size:16px;margin-bottom:4px;"><i class="fa-solid fa-wand-magic-sparkles"></i></div>
-          <div class="stat-label">Creativity</div>
-          <div class="stat-value" style="font-size:22px;color:var(--gold);">${creativityVal}</div>
-          <div class="stat-sub" style="font-size:11px;">Innovation & Flow</div>
-        </div>
-      </div>
+      <div class="home-row home-row-attributes"></div>
 
       <!-- Reward Banners -->
       <div class="home-row home-row-top" style="margin-bottom:16px;">
@@ -354,7 +337,7 @@ window.PageHome = {
 
     const firstDay = new Date(year, month, 1).getDay();
     const daysInMonth = new Date(year, month + 1, 0).getDate();
-    const today = new Date().toISOString().split('T')[0];
+    const today = toLocalDateString(new Date());
 
     let cells = '';
     for (let i = 0; i < firstDay; i++) cells += `<div class="cal-day other-month"></div>`;

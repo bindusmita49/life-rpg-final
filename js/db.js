@@ -4,6 +4,14 @@
 
 'use strict';
 
+// ── Local-date helper — avoids UTC off-by-one for timezones ahead of UTC ──
+function toLocalDateString(date) {
+  const year  = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const day   = String(date.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
+}
+
 // ── Supabase client (lazy-loaded) ─────────────────────
 let _supabase = null;
 function getClient() {
@@ -80,7 +88,7 @@ function seedDemoData() {
   for (let d = 29; d >= 0; d--) {
     const date = new Date(today);
     date.setDate(today.getDate() - d);
-    const ds = date.toISOString().split('T')[0];
+    const ds = toLocalDateString(date);
     DEFAULT_HABITS.forEach(h => {
       // Give each habit random but convincing streaks
       const chance = h.id === 'h1' ? .88 : h.id === 'h6' ? .82 : h.id === 'h2' ? .75 : .7;
@@ -277,7 +285,7 @@ window.DB = {
 
     async create(habit) {
       if (isDemo()) {
-        const h = { id: crypto.randomUUID(), ...habit, createdAt: new Date().toISOString().split('T')[0], isActive: true };
+        const h = { id: crypto.randomUUID(), ...habit, createdAt: toLocalDateString(new Date()), isActive: true };
         const list = LS.get('habits', []);
         list.push(h); LS.set('habits', list);
         return h;
@@ -363,7 +371,7 @@ window.DB = {
         return LS.get('logs', []).filter(l => (l.date || l.completed_at || '').startsWith(prefix));
       }
       const start = `${year}-${String(month).padStart(2,'0')}-01`;
-      const end   = new Date(year, month, 0).toISOString().split('T')[0];
+      const end   = toLocalDateString(new Date(year, month, 0));
       const client = getClient();
       if (!client) return [];
       const { data: uData } = await client.auth.getUser();
@@ -419,7 +427,7 @@ window.DB = {
   rewards: {
     async calculate() {
       const habits = await window.DB.habits.getAll();
-      const today  = new Date().toISOString().split('T')[0];
+      const today  = toLocalDateString(new Date());
       const todayLogs = await window.DB.logs.getForDate(today);
 
       const starShells    = todayLogs.length;
@@ -456,7 +464,7 @@ window.DB = {
       for (let i = 0; i < dates.length; i++) {
         const expected = new Date(today);
         expected.setDate(today.getDate() - i);
-        const exp = expected.toISOString().split('T')[0];
+        const exp = toLocalDateString(expected);
         if (dates[i] === exp) streak++;
         else break;
       }
@@ -484,7 +492,7 @@ window.DB = {
     getCompletionRate(logs, habitId, days = 30) {
       const start = new Date();
       start.setDate(start.getDate() - days + 1);
-      const startDate = start.toISOString().split('T')[0];
+      const startDate = toLocalDateString(start);
       const count = logs.filter(l =>
         (l.habitId || l.habit_id) === habitId &&
         (l.date || l.completed_at) >= startDate
@@ -503,8 +511,8 @@ window.DB = {
       } else {
         const start = new Date(today);
         start.setDate(today.getDate() - 365);
-        const startStr = start.toISOString().split('T')[0];
-        const todayStr = today.toISOString().split('T')[0];
+        const startStr = toLocalDateString(start);
+        const todayStr = toLocalDateString(today);
         logs = await window.DB.logs.getForRange(startStr, todayStr);
       }
 
@@ -512,7 +520,7 @@ window.DB = {
       for (let d = 0; d < 365; d++) {
         const date = new Date(today);
         date.setDate(today.getDate() - d);
-        const ds = date.toISOString().split('T')[0];
+        const ds = toLocalDateString(date);
         const dayLogs = logs.filter(l => (l.date || l.completed_at) === ds);
         if (dayLogs.length > 0) streak++;
         else if (d > 0) break;

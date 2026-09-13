@@ -3,6 +3,14 @@
    ========================================================= */
 'use strict';
 
+// Local-date helper — avoids UTC off-by-one for timezones ahead of UTC
+function toLocalDateString(date) {
+  const year  = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const day   = String(date.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
+}
+
 window.PageCalendar = {
   year: new Date().getFullYear(),
   month: new Date().getMonth(),
@@ -29,7 +37,7 @@ window.PageCalendar = {
     if (!wrap) return;
     const habits = await DB.habits.getAll();
     const logs   = await DB.logs.getForMonth(this.year, this.month + 1);
-    const today  = new Date().toISOString().split('T')[0];
+    const today  = toLocalDateString(new Date());
 
     const monthNames = ['January','February','March','April','May','June','July','August','September','October','November','December'];
     const firstDay   = new Date(this.year, this.month, 1).getDay();
@@ -193,7 +201,7 @@ window.PageCalendar = {
     const now = new Date();
     this.year  = now.getFullYear();
     this.month = now.getMonth();
-    this.selectedDate = now.toISOString().split('T')[0];
+    this.selectedDate = toLocalDateString(now);
     this.renderCalendar();
   },
 };
