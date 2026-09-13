@@ -13,11 +13,7 @@ window.PageSettings = {
     const name    = profile?.full_name || profile?.fullName || user?.fullName || user?.full_name || user?.user_metadata?.full_name || user?.email?.split('@')[0] || 'Explorer';
     const initial = name[0]?.toUpperCase() || 'U';
 
-    const prefs = profile?.preferences || {};
-    const remindersChecked = prefs['pref-reminders'] !== undefined ? prefs['pref-reminders'] : (localStorage.getItem('hf_pref_pref-reminders') !== null ? localStorage.getItem('hf_pref_pref-reminders') === 'true' : true);
-    const streaksChecked   = prefs['pref-streaks'] !== undefined ? prefs['pref-streaks'] : (localStorage.getItem('hf_pref_pref-streaks') !== null ? localStorage.getItem('hf_pref_pref-streaks') === 'true' : true);
-    const weeklyChecked    = prefs['pref-weekly'] !== undefined ? prefs['pref-weekly'] : (localStorage.getItem('hf_pref_pref-weekly') !== null ? localStorage.getItem('hf_pref_pref-weekly') === 'true' : true);
-    const compactChecked   = prefs['pref-compact'] !== undefined ? prefs['pref-compact'] : (localStorage.getItem('hf_compact') === 'true');
+
 
     section.innerHTML = `
       <div class="page-hero" style="margin-bottom:24px;">
@@ -132,42 +128,8 @@ window.PageSettings = {
           <!-- Preferences Panel -->
           <div class="settings-panel ${this.activePanel==='preferences'?'active':''}" id="panel-preferences">
             <div class="settings-section">
-              <div class="settings-section-title"><i class="fa-solid fa-bell"></i> Notifications</div>
-              ${[
-                ['Daily Reminders', 'Get reminded to complete your habits', 'pref-reminders', remindersChecked],
-                ['Streak Alerts',   'Be notified when you\'re at risk of breaking a streak', 'pref-streaks', streaksChecked],
-                ['Weekly Summary',  'Receive a weekly digest of your progress', 'pref-weekly', weeklyChecked],
-              ].map(([title,desc,id,checked]) => `
-                <div class="settings-row">
-                  <div class="settings-row-info">
-                    <strong>${title}</strong>
-                    <span>${desc}</span>
-                  </div>
-                  <label class="toggle">
-                    <input type="checkbox" id="${id}" ${checked ? 'checked' : ''} onchange="PageSettings.savePref('${id}',this.checked)">
-                    <span class="toggle-slider"></span>
-                  </label>
-                </div>`).join('')}
-            </div>
-            <div class="settings-section">
-              <div class="settings-section-title"><i class="fa-solid fa-palette"></i> Appearance</div>
-              <div class="settings-row">
-                <div class="settings-row-info">
-                  <strong>Ocean Theme</strong>
-                  <span>Deep ocean glassmorphism</span>
-                </div>
-                <span style="padding:6px 14px;background:linear-gradient(135deg,var(--teal-dark),var(--teal));border-radius:20px;font-size:12px;font-weight:600">Active</span>
-              </div>
-              <div class="settings-row">
-                <div class="settings-row-info">
-                  <strong>Compact Mode</strong>
-                  <span>Reduce spacing and card sizes</span>
-                </div>
-                <label class="toggle">
-                  <input type="checkbox" id="pref-compact" ${compactChecked ? 'checked' : ''} onchange="PageSettings.toggleCompact(this.checked)">
-                  <span class="toggle-slider"></span>
-                </label>
-              </div>
+              <div class="settings-section-title"><i class="fa-solid fa-sliders"></i> Preferences</div>
+              <p style="color:var(--text-secondary);font-size:13.5px;margin:0;">No additional preferences to configure at this time.</p>
             </div>
           </div>
 
@@ -314,19 +276,7 @@ window.PageSettings = {
     }
   },
 
-  async toggleCompact(on) {
-    document.body.classList.toggle('compact', on);
-    localStorage.setItem('hf_compact', on);
-    try {
-      const profile = (await DB.profile.get()) || {};
-      const currentPrefs = profile.preferences || {};
-      const updatedPrefs = { ...currentPrefs, 'pref-compact': on };
-      await DB.profile.update({ preferences: updatedPrefs });
-      App.toast('Preference saved', 'success');
-    } catch (e) {
-      App.toast('Error saving preference: ' + e.message, 'error');
-    }
-  },
+
 
   exportData() {
     const data = {
