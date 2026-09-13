@@ -143,14 +143,6 @@ Life RPG leans into a **deep-sea ocean aesthetic** — dark navy-to-teal gradien
 
 ---
 
-## 👥 Team
-
-Built in a 20-hour hackathon by:
-
-- **Bindusmita** — Frontend, UI/UX, Supabase integration, gamification design
-- **Biswanath** — Backend architecture, database design
-
----
 
 ## 📄 License
 
